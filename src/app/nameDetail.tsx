@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useNameDetailViewModel } from "../viewmodel/useNameDetailViewModel";
 import { theme } from "./theme";
+import PieChart from "react-native-expo-pie-chart";
 
 export default function NameDetailScreen() {
   const { state, actions } = useNameDetailViewModel();
@@ -21,7 +22,19 @@ export default function NameDetailScreen() {
     if (nome) actions.fetchNameDetail(String(nome));
   }, [nome]);
 
-  const periodColors = ["#FFEDD5", "#E0F2FE", "#E9D5FF", "#DCFCE7", "#FCE7F3"];
+const periodColors = [
+  "#FFEDD5", // pêssego
+  "#FDE68A", // amarelo pastel
+  "#FECACA", // vermelho claro
+  "#E9D5FF", // lilás
+  "#D9F99D", // verde limão pastel
+  "#BFDBFE", // azul claro único
+  "#FBCFE8", // rosa pastel
+  "#FED7AA", // laranja claro
+  "#F5D0C5", // salmão suave
+];
+
+
 
   if (state.loading) {
     return (
@@ -48,7 +61,11 @@ export default function NameDetailScreen() {
   }
 
   const detail = state.detail;
-
+  const chartData = detail.res.map((item, index) => ({
+  key: item.periodoFormatado ?? item.periodo,
+  count: item.frequencia,
+  color: periodColors[index % periodColors.length],
+}));
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -59,7 +76,7 @@ export default function NameDetailScreen() {
           {/* 🔙 Botão de voltar */}
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.replace("/home")}
+            onPress={() => router.back()}
           >
             <Ionicons
               name="arrow-back"
@@ -71,6 +88,9 @@ export default function NameDetailScreen() {
 
           {/* Título */}
           <Text style={styles.title}>{detail.nome}</Text>
+          {/* 📊 Gráfico de Pizza */}
+
+
 
           {/* Card principal */}
           <View style={styles.infoCard}>
@@ -114,11 +134,42 @@ export default function NameDetailScreen() {
   {new Intl.NumberFormat("pt-BR").format(item.frequencia)}
 </Text>
 
+
                 </View>
+                
               )}
+              
             />
           </View>
+          <View style={styles.chartCard}>
+  <Text style={styles.chartTitle}>Distribuição por Período</Text>
+
+ <PieChart
+  data={chartData}
+  length={220}
+  rotation={-90}
+  zeroTotalCircleColor="#F1F6F9"
+  containerProps={{}}
+  svgProps={{}}
+  gProps={{}}
+  circleProps={{}}
+/>
+
+
+  {/* Legenda */}
+  <View style={styles.legendContainer}>
+    {chartData.map((item) => (
+      <View key={item.key} style={styles.legendRow}>
+        <View style={[styles.colorBox, { backgroundColor: item.color }]} />
+        <Text style={styles.legendText}>
+          {item.key}: {new Intl.NumberFormat("pt-BR").format(item.count)}
+        </Text>
+      </View>
+    ))}
+  </View>
+</View>
         </View>
+        
       </ScrollView>
     </SafeAreaView>
   );
@@ -214,4 +265,42 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "red",
   },
+  chartCard: {
+  backgroundColor: "#fff",
+  padding: 20,
+  borderRadius: 20,
+  elevation: 5,
+  marginBottom: 25,
+  alignItems: "center",
+},
+
+chartTitle: {
+  fontSize: 18,
+  fontWeight: "bold",
+  color: theme.colors.secondary,
+  marginBottom: 15,
+},
+
+legendContainer: {
+  marginTop: 20,
+  width: "100%",
+},
+
+legendRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 6,
+},
+
+colorBox: {
+  width: 16,
+  height: 16,
+  borderRadius: 4,
+  marginRight: 8,
+},
+
+legendText: {
+  fontSize: 15,
+},
+
 });
