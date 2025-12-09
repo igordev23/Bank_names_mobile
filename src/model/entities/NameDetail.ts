@@ -1,6 +1,7 @@
 export type NamePeriod = {
   periodo: string;      // ex: "[1940,1950["
   frequencia: number;   // ex: 40
+  periodoFormatado?: string;
 };
 
 export type NameDetail = {

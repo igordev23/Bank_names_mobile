@@ -1,76 +1,309 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { useSearchViewModel } from '../viewmodel/useSearchViewModel';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useSearchViewModel } from "../viewmodel/useSearchViewModel";
+import { theme } from "./theme";
 
-const SearchScreen = () => {
+export default function SearchScreen() {
+  const router = useRouter();
   const { state, actions } = useSearchViewModel();
-  const [query, setQuery] = useState('');
-  const [selectedSex, setSelectedSex] = useState<'M' | 'F' | 'A'>('A');
+  const [query, setQuery] = useState("");
+  const [selectedSex, setSelectedSex] = useState<"M" | "F" | "A">("A");
 
   const handleSearch = () => {
+    if (!query.trim()) return;
     actions.searchName(query, selectedSex);
   };
 
+  const periodColors = [
+    "#FFEDD5",
+    "#E0F2FE",
+    "#E9D5FF",
+    "#DCFCE7",
+    "#FCE7F3",
+  ];
+
   return (
-    <View className="flex-1 p-4 bg-white">
-      <Text className="text-xl font-bold mb-4">Pesquisar Nome</Text>
-
-      {/* Input */}
-      <TextInput
-        className="border p-2 mb-4"
-        placeholder="Digite um nome"
-        value={query}
-        onChangeText={setQuery}
-      />
-
-      {/* Dropdown */}
-      <Text className="mb-2 font-semibold">Sexo:</Text>
-      <Picker
-        selectedValue={selectedSex}
-        onValueChange={(value) => setSelectedSex(value)}
-        style={{ borderWidth: 1, borderColor: "#ccc" }}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 60 }}
+        showsVerticalScrollIndicator={false}
       >
-        <Picker.Item label="Ambos" value="A" />
-        <Picker.Item label="Masculino" value="M" />
-        <Picker.Item label="Feminino" value="F" />
-      </Picker>
+        <View style={styles.container}>
 
-      {/* Botão */}
-      <Button title="Pesquisar" onPress={handleSearch} />
+          {/* 🔙 Botão de voltar */}
+          <TouchableOpacity style={styles.backButton} onPress={() => router.replace("/home")}>
+            <Ionicons name="arrow-back" size={22} color={theme.colors.primary} />
+            <Text style={styles.backText}>Voltar</Text>
+          </TouchableOpacity>
 
-      {/* Loading */}
-      {state.loading && <Text className="mt-4">Carregando...</Text>}
+          {/* Títulos */}
+          <Text style={styles.title}>Pesquisar Nome</Text>
+          <Text style={styles.subtitle}>
+            Consulta com base nos dados do IBGE
+          </Text>
 
-      {/* Erro */}
-      {state.error && (
-        <Text className="mt-4 text-red-600">{state.error}</Text>
-      )}
+          {/* Card do formulário */}
+          <View style={styles.searchCard}>
+            <Text style={styles.label}>Nome:</Text>
 
-      {/* Resultado */}
-      {state.result && (
-        <View className="mt-6">
-          <Text className="text-2xl font-bold">{state.result.nome}</Text>
-          <Text>Sexo: {state.result.sexo ?? "—"}</Text>
-          <Text>Localidade: {state.result.localidade}</Text>
-          <Text>Total registrado: {state.result.total}</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="person-circle-outline"
+                size={22}
+                color={theme.colors.primary}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Digite um nome"
+                placeholderTextColor="#777"
+                value={query}
+                onChangeText={setQuery}
+              />
+            </View>
 
-          <Text className="text-lg font-bold mt-4">Frequência por período:</Text>
+            <Text style={styles.label}>Sexo:</Text>
 
-          <FlatList
-            data={state.result.res}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View className="flex-row justify-between border-b py-2">
-                <Text>{item.periodo}</Text>
-                <Text>{item.frequencia}</Text>
-              </View>
-            )}
-          />
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={selectedSex}
+                onValueChange={(v) => setSelectedSex(v)}
+              >
+                <Picker.Item label="Ambos" value="A" />
+                <Picker.Item label="Masculino" value="M" />
+                <Picker.Item label="Feminino" value="F" />
+              </Picker>
+            </View>
+
+            <TouchableOpacity style={styles.button} onPress={handleSearch}>
+              <Ionicons name="search" size={20} color="#fff" />
+              <Text style={styles.buttonText}>Pesquisar</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Loading */}
+          {state.loading && <Text style={styles.loading}>Carregando...</Text>}
+
+          {/* Erro */}
+          {state.error && <Text style={styles.error}>{state.error}</Text>}
+
+          {/* Resultado */}
+          {state.result && (
+            <View style={styles.resultCard}>
+              <Text style={styles.resultTitle}>{state.result.nome}</Text>
+
+              <Text style={styles.resultText}>
+                <Text style={styles.bold}>Sexo:</Text>{" "}
+                {state.result.sexo ?? "—"}
+              </Text>
+
+              <Text style={styles.resultText}>
+                <Text style={styles.bold}>Localidade:</Text>{" "}
+                {state.result.localidade}
+              </Text>
+
+              <Text style={styles.resultText}>
+                <Text style={styles.bold}>Total Registrado:</Text>{" "}
+                {new Intl.NumberFormat("pt-BR").format(state.result.total)}
+              </Text>
+
+              <Text style={styles.frequencyTitle}>
+                Frequência por período:
+              </Text>
+
+              {/* Lista sem scroll — rola junto com a página */}
+              <FlatList
+                data={state.result.res}
+                keyExtractor={(_, i) => i.toString()}
+                scrollEnabled={false}
+                renderItem={({ item, index }) => (
+                  <View
+                    style={[
+                      styles.frequencyRow,
+                      {
+                        backgroundColor:
+                          periodColors[index % periodColors.length],
+                      },
+                    ]}
+                  >
+                    <Text style={styles.periodText}>
+                      {item.periodoFormatado ?? item.periodo}
+                    </Text>
+
+                     <Text style={styles.bold}>
+  {new Intl.NumberFormat("pt-BR").format(item.frequencia)}
+</Text>
+                  </View>
+                )}
+              />
+            </View>
+          )}
         </View>
-      )}
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
-};
+}
 
-export default SearchScreen;
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.light,
+  },
+
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+
+  /* 🔙 botão de voltar */
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
+  backText: {
+    marginLeft: 6,
+    fontSize: 16,
+    color: theme.colors.primary,
+    fontWeight: "600",
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: theme.colors.primary,
+  },
+
+  subtitle: {
+    fontSize: 15,
+    color: theme.colors.secondary,
+    marginBottom: 25,
+  },
+
+  searchCard: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 20,
+    elevation: 5,
+    marginBottom: 25,
+  },
+
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 10,
+    marginBottom: 5,
+    color: theme.colors.primary,
+  },
+
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f1f1f1",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 10,
+  },
+
+  input: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+  },
+
+  pickerWrapper: {
+    backgroundColor: "#f1f1f1",
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+
+  button: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 14,
+    borderRadius: 14,
+    marginTop: 10,
+  },
+
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    marginLeft: 8,
+    fontWeight: "bold",
+  },
+
+  loading: {
+    marginTop: 20,
+    fontSize: 18,
+    color: theme.colors.primary,
+  },
+
+  error: {
+    marginTop: 20,
+    color: "red",
+    fontSize: 16,
+  },
+
+  resultCard: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 20,
+    elevation: 4,
+    marginBottom: 40,
+  },
+
+  resultTitle: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: theme.colors.primary,
+    marginBottom: 10,
+  },
+
+  resultText: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+
+  bold: {
+    fontWeight: "bold",
+  },
+
+  frequencyTitle: {
+    marginTop: 15,
+    fontSize: 18,
+    fontWeight: "bold",
+    color: theme.colors.secondary,
+    marginBottom: 10,
+  },
+
+  frequencyRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+  },
+
+  periodText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.primary,
+  },
+});

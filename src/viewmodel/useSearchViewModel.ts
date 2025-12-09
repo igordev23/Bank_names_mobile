@@ -11,34 +11,46 @@ const [result, setResult] = useState<NameDetail | null>(null);
   const repository = useMemo(() => new NameRepository(), []);
 
   const searchName = useCallback(async (nome: string, sexo: "M" | "F" | "A") => {
+  const cleanName = nome.trim().toLowerCase();
 
-    const cleanName = nome.trim().toLowerCase();
-
-    if (!cleanName) {
-      setError("Digite um nome válido");
-      setResult(null);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
+  if (!cleanName) {
+    setError("Digite um nome válido");
     setResult(null);
+    return;
+  }
 
-    try {
-      const data = await repository.getNameDetail(cleanName, sexo);
+  setLoading(true);
+  setError(null);
+  setResult(null);
 
-      if (data) {
-        setResult({
-          ...data,
-          total: data.total ?? 0,
-        });
-      }
-    } catch (err) {
-      setError((err as Error).message || "Erro inesperado");
-    } finally {
-      setLoading(false);
+  try {
+    const data = await repository.getNameDetail(cleanName, sexo);
+
+    if (data) {
+      // 🔥 Transformar períodos para visual bonito
+      const formattedRes = data.res.map((item) => {
+        const clean = item.periodo.replace("[", "").replace("[", "").replace("]", "").replace(",", "→");
+        // Ex: "[1980,1990[" vira "1980 → 1990"
+
+        return {
+          ...item,
+          periodoFormatado: clean.trim(),
+        };
+      });
+
+      setResult({
+        ...data,
+        total: data.total ?? 0,
+        res: formattedRes,
+      });
     }
-  }, [repository]);
+  } catch (err) {
+    setError((err as Error).message || "Erro inesperado");
+  } finally {
+    setLoading(false);
+  }
+}, [repository]);
+
 
   return {
     state: { result, loading, error },
