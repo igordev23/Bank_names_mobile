@@ -15,6 +15,11 @@ import { useRouter } from "expo-router";
 import { useSearchViewModel } from "../viewmodel/useSearchViewModel";
 import { theme } from "./theme";
 import PieChart from "react-native-expo-pie-chart";
+import { BarChart } from "react-native-gifted-charts";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+
+
+
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -26,6 +31,7 @@ export default function SearchScreen() {
     if (!query.trim()) return;
     actions.searchName(query, selectedSex);
   };
+
 
 const periodColors = [
   "#FFEDD5", // pêssego
@@ -47,6 +53,15 @@ const chartData = state.result
         color: periodColors[index % periodColors.length],
       }))
   : [];
+
+
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+const barData = chartData.map((item, index) => ({
+  value: item.count,
+  label: item.key,
+  color: periodColors[index % periodColors.length],
+}));
 
 
   return (
@@ -165,25 +180,28 @@ const chartData = state.result
               />
               
             </View>)}
-             {/* 📊 Gráfico de Pizza */}
+{/* 📊 Gráfico de Colunas */}
 <View style={styles.chartCard}>
   <Text style={styles.chartTitle}>Distribuição por Período</Text>
 
-  <PieChart
-  data={chartData}
-  length={220}
-  rotation={-90}
-  zeroTotalCircleColor="#F1F6F9"
-  containerProps={{}}
-  svgProps={{}}
-  gProps={{
-    stroke: "#333",      // 🔥 borda clara entre fatias
-    strokeWidth: 2,      // 🔥 ajusta espessura
-  }}
-  circleProps={{}}
-/>
+  <BarChart
+    data={chartData.map((item, index) => ({
+      value: item.count,
+      label: item.key,
+      frontColor: periodColors[index % periodColors.length],
+      color: periodColors[index % periodColors.length],
 
-  {/* Legenda */}
+      // 👉 Agora está correto
+      onPress: () => setSelectedIndex(index),
+    }))}
+    barWidth={28}
+    spacing={14}
+    barBorderRadius={6}
+    hideRules={false}
+    isAnimated
+  />
+
+  {/* Legenda fixa */}
   <View style={styles.legendContainer}>
     {chartData.map((item) => (
       <View key={item.key} style={styles.legendRow}>
@@ -194,12 +212,44 @@ const chartData = state.result
       </View>
     ))}
   </View>
-</View>
-          
-         
- 
 
-        </View>
+  {/* 🎈 BALÃO LATERAL */}
+  {selectedIndex !== null && (
+    <View
+      style={{
+        position: "absolute",
+        top: 50,
+        left: 140,
+        backgroundColor: "white",
+        padding: 10,
+        borderRadius: 10,
+        elevation: 5,
+        shadowColor: "#000",
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        maxWidth: 150,
+      }}
+    >
+      <Text
+        style={{
+          fontWeight: "bold",
+          color: barData[selectedIndex].color,
+        }}
+      >
+        {barData[selectedIndex].label}
+      </Text>
+
+      <Text>
+        {new Intl.NumberFormat("pt-BR").format(
+          barData[selectedIndex].value
+        )}
+      </Text>
+    </View>
+  )}
+</View>
+
+
+   </View>
       </ScrollView>
     </SafeAreaView>
   );
