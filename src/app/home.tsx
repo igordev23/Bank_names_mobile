@@ -12,7 +12,8 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { RewardedAd, RewardedAdEventType, AdEventType, TestIds } from "react-native-google-mobile-ads"; // Correção aqui
 import { theme } from "../theme/theme";
-
+import { InterstitialAd } from "react-native-google-mobile-ads"; // Importação para o anúncio intersticial
+// ... existing code ...
 /* ===========================
    CONFIGURAÇÃO DO ANÚNCIO PREMIADO
 =========================== */
@@ -43,6 +44,37 @@ async function showRewardedAd(onFinish: () => void) {
     rewardedAd.load();
   } catch (error) {
     console.log("Erro no anúncio premiado:", error);
+    onFinish();
+  }
+}
+
+
+/* ===========================
+   CONFIGURAÇÃO DO ANÚNCIO INTERSTICIAL
+=========================== */
+const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-3940256099942544/1033173712"; // Use TestIds em desenvolvimento
+const interstitialAd = InterstitialAd.createForAdRequest(interstitialAdUnitId);
+
+async function showInterstitialAd(onFinish: () => void) {
+  if (Platform.OS !== "android") {
+    onFinish();
+    return;
+  }
+
+  try {
+    // Adiciona eventos para o anúncio intersticial
+    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
+      interstitialAd.show();
+    });
+
+    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
+      onFinish();
+    });
+
+    // Carrega o anúncio
+    interstitialAd.load();
+  } catch (error) {
+    console.log("Erro no anúncio intersticial:", error);
     onFinish();
   }
 }
@@ -97,7 +129,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.cardLarge}
             onPress={() =>
-              showRewardedAd(() => router.push("/search"))
+              showInterstitialAd(() => router.push("/search"))
             }
           >
             <Ionicons
