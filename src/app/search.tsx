@@ -33,35 +33,35 @@ export default function SearchScreen() {
   };
 
 
-const periodColors = [
-  "#FFEDD5", // pêssego
-  "#FDE68A", // amarelo pastel
-  "#FECACA", // vermelho claro
-  "#E9D5FF", // lilás
-  "#D9F99D", // verde limão pastel
-  "#BFDBFE", // azul claro único
-  "#FBCFE8", // rosa pastel
-  "#FED7AA", // laranja claro
-  "#F5D0C5", // salmão suave
-];
-const chartData = state.result
-  ? [...state.result.res]
+  const periodColors = [
+    "#FFEDD5", // pêssego
+    "#FDE68A", // amarelo pastel
+    "#FECACA", // vermelho claro
+    "#E9D5FF", // lilás
+    "#D9F99D", // verde limão pastel
+    "#BFDBFE", // azul claro único
+    "#FBCFE8", // rosa pastel
+    "#FED7AA", // laranja claro
+    "#F5D0C5", // salmão suave
+  ];
+  const chartData = state.result
+    ? [...state.result.res]
       .sort((a, b) => a.frequencia - b.frequencia)
       .map((item, index) => ({
         key: item.periodoFormatado ?? item.periodo,
         count: item.frequencia <= 0 ? 1 : item.frequencia, // garante mínimo
         color: periodColors[index % periodColors.length],
       }))
-  : [];
+    : [];
 
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-const barData = chartData.map((item, index) => ({
-  value: item.count,
-  label: item.key,
-  color: periodColors[index % periodColors.length],
-}));
+  const barData = chartData.map((item, index) => ({
+    value: item.count,
+    label: item.key,
+    color: periodColors[index % periodColors.length],
+  }));
 
 
   return (
@@ -75,7 +75,7 @@ const barData = chartData.map((item, index) => ({
 
           {/* 🔙 Botão de voltar */}
           <TouchableOpacity style={styles.backButton} onPress={() => router.replace("/home")}>
-            <Ionicons name="arrow-back" size={22} color={theme.colors.primary} />
+           
             <Text style={styles.backText}>Voltar</Text>
           </TouchableOpacity>
 
@@ -172,84 +172,84 @@ const barData = chartData.map((item, index) => ({
                       {item.periodoFormatado ?? item.periodo}
                     </Text>
 
-                     <Text style={styles.bold}>
-  {new Intl.NumberFormat("pt-BR").format(item.frequencia)}
-</Text>
+                    <Text style={styles.bold}>
+                      {new Intl.NumberFormat("pt-BR").format(item.frequencia)}
+                    </Text>
                   </View>
                 )}
               />
-              
+
             </View>)}
-{/* 📊 Gráfico de Colunas */}
-<View style={styles.chartCard}>
-  <Text style={styles.chartTitle}>Distribuição por Período</Text>
+          {/* 📊 Gráfico de Colunas */}
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Distribuição por Período</Text>
 
-  <BarChart
-    data={chartData.map((item, index) => ({
-      value: item.count,
-      label: item.key,
-      frontColor: periodColors[index % periodColors.length],
-      color: periodColors[index % periodColors.length],
+            <BarChart
+              data={chartData.map((item, index) => ({
+                value: item.count,
+                label: item.key,
+                frontColor: periodColors[index % periodColors.length],
+                color: periodColors[index % periodColors.length],
 
-      // 👉 Agora está correto
-      onPress: () => setSelectedIndex(index),
-    }))}
-    barWidth={28}
-    spacing={14}
-    barBorderRadius={6}
-    hideRules={false}
-    isAnimated
-  />
+                // 👉 Agora está correto
+                onPress: () => setSelectedIndex(index),
+              }))}
+              barWidth={28}
+              spacing={14}
+              barBorderRadius={6}
+              hideRules={false}
+              isAnimated
+            />
 
-  {/* Legenda fixa */}
-  <View style={styles.legendContainer}>
-    {chartData.map((item) => (
-      <View key={item.key} style={styles.legendRow}>
-        <View style={[styles.colorBox, { backgroundColor: item.color }]} />
-        <Text style={styles.legendText}>
-          {item.key}: {new Intl.NumberFormat("pt-BR").format(item.count)}
-        </Text>
-      </View>
-    ))}
-  </View>
+            {/* Legenda fixa */}
+            <View style={styles.legendContainer}>
+              {chartData.map((item) => (
+                <View key={item.key} style={styles.legendRow}>
+                  <View style={[styles.colorBox, { backgroundColor: item.color }]} />
+                  <Text style={styles.legendText}>
+                    {item.key}: {new Intl.NumberFormat("pt-BR").format(item.count)}
+                  </Text>
+                </View>
+              ))}
+            </View>
 
-  {/* 🎈 BALÃO LATERAL */}
-  {selectedIndex !== null && (
-    <View
-      style={{
-        position: "absolute",
-        top: 50,
-        left: 140,
-        backgroundColor: "white",
-        padding: 10,
-        borderRadius: 10,
-        elevation: 5,
-        shadowColor: "#000",
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        maxWidth: 150,
-      }}
-    >
-      <Text
-        style={{
-          fontWeight: "bold",
-          color: barData[selectedIndex].color,
-        }}
-      >
-        {barData[selectedIndex].label}
-      </Text>
+            {/* 🎈 BALÃO LATERAL */}
+            {selectedIndex !== null && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 50,
+                  left: 140,
+                  backgroundColor: "white",
+                  padding: 10,
+                  borderRadius: 10,
+                  elevation: 5,
+                  shadowColor: "#000",
+                  shadowOpacity: 0.2,
+                  shadowRadius: 6,
+                  maxWidth: 150,
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    color: barData[selectedIndex].color,
+                  }}
+                >
+                  {barData[selectedIndex].label}
+                </Text>
 
-      <Text>
-        {new Intl.NumberFormat("pt-BR").format(
-          barData[selectedIndex].value
-        )}
-      </Text>
-    </View>
-  )}
-</View>
+                <Text>
+                  {new Intl.NumberFormat("pt-BR").format(
+                    barData[selectedIndex].value
+                  )}
+                </Text>
+              </View>
+            )}
+          </View>
 
 
-   </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -266,17 +266,20 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
-  /* 🔙 botão de voltar */
+  /* back button */
   backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
+    alignItems: "center", // Centraliza o texto horizontalmente
+    justifyContent: "center", // Centraliza o texto verticalmente
+    paddingVertical: 12, // Aumenta a área clicável verticalmente
+    paddingHorizontal: 16, // Aumenta a área clicável horizontalmente
+    borderRadius: 8, // Adiciona bordas arredondadas
+    backgroundColor: "#db3026", // Cor de fundo vermelha
+    marginBottom: 12,
   },
-
   backText: {
-    marginLeft: 6,
+    marginLeft: 8,
     fontSize: 16,
-    color: theme.colors.primary,
+    color: "white",
     fontWeight: "600",
   },
 
@@ -405,42 +408,42 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: theme.colors.primary,
   },
-   chartCard: {
-  backgroundColor: "#fff",
-  padding: 20,
-  borderRadius: 20,
-  elevation: 5,
-  marginBottom: 25,
-  alignItems: "center",
-},
+  chartCard: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 20,
+    elevation: 5,
+    marginBottom: 25,
+    alignItems: "center",
+  },
 
-chartTitle: {
-  fontSize: 18,
-  fontWeight: "bold",
-  color: theme.colors.secondary,
-  marginBottom: 15,
-},
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: theme.colors.secondary,
+    marginBottom: 15,
+  },
 
-legendContainer: {
-  marginTop: 20,
-  width: "100%",
-},
+  legendContainer: {
+    marginTop: 20,
+    width: "100%",
+  },
 
-legendRow: {
-  flexDirection: "row",
-  alignItems: "center",
-  marginBottom: 6,
-},
+  legendRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
 
-colorBox: {
-  width: 16,
-  height: 16,
-  borderRadius: 4,
-  marginRight: 8,
-},
+  colorBox: {
+    width: 16,
+    height: 16,
+    borderRadius: 4,
+    marginRight: 8,
+  },
 
-legendText: {
-  fontSize: 15,
-},
+  legendText: {
+    fontSize: 15,
+  },
 
 });

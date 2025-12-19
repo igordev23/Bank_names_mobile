@@ -43,14 +43,12 @@ export default function BottomNamesScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-       {/* 🔙 Botão de voltar */}
-                <TouchableOpacity style={styles.backButton} onPress={() => router.replace("/home")}>
-                  <Ionicons name="arrow-back" size={22} color={theme.colors.primary} />
-                  <Text style={styles.backText}>Voltar</Text>
-                </TouchableOpacity>
-      
-
       <View style={styles.container}>
+        {/* 🔙 Botão de voltar */}
+        <TouchableOpacity style={styles.backButton} onPress={() => router.replace("/home")}>
+          <Text style={styles.backText}>Voltar</Text>
+        </TouchableOpacity>
+
         <Text style={styles.title}>Nomes Mais Raros</Text>
         <Text style={styles.subtitle}>
           Lista dos nomes com menor frequência no Brasil
@@ -125,11 +123,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     color: theme.colors.primary,
+    marginBottom: 6,
   },
   subtitle: {
     color: theme.colors.secondary,
     fontSize: 15,
-    marginBottom: 20,
+    marginBottom: 18,
   },
 
   card: {
@@ -137,21 +136,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     borderRadius: 16,
-    marginBottom: 14,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    marginBottom: 12,
+    borderWidth: 1, // Adiciona uma borda para indicar elevação
+    borderColor: "#E0E0E0", // Cor tonal para representar elevação
   },
 
   cardLeft: {
     width: 40,
     alignItems: "center",
+    justifyContent: "center",
   },
 
   cardContent: {
     flex: 1,
+    marginLeft: 8,
   },
 
   cardName: {
@@ -162,19 +160,22 @@ const styles = StyleSheet.create({
 
   cardFrequency: {
     color: "#555",
-    marginTop: 2,
-  },
-  /* 🔙 botão de voltar */
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
+    marginTop: 4,
   },
 
+  /* back button */
+  backButton: {
+    alignItems: "center", // Centraliza o texto horizontalmente
+    justifyContent: "center", // Centraliza o texto verticalmente
+    paddingVertical: 12, // Aumenta a área clicável verticalmente
+    paddingHorizontal: 16, // Aumenta a área clicável horizontalmente
+    borderRadius: 8, // Adiciona bordas arredondadas
+    backgroundColor: "#db3026", // Cor de fundo vermelha
+    marginBottom: 12,
+  },
   backText: {
-    marginLeft: 6,
     fontSize: 16,
-    color: theme.colors.primary,
+    color: "#FFFFFF", // Texto branco
     fontWeight: "600",
   },
 });

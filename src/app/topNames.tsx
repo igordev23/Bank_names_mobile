@@ -18,7 +18,7 @@ export default function TopNamesScreen() {
   const { state, actions } = useTopNamesViewModel();
 
   React.useEffect(() => {
-    actions.fetchTopNames(20);
+    actions.fetchTopNames(20); // Busca os 20 nomes mais usados
   }, []);
 
   if (state.loading) {
@@ -36,8 +36,8 @@ export default function TopNamesScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}>
-          <Ionicons name="alert-circle-outline" size={40} color="red" />
-          <Text style={styles.error}>{state.error}</Text>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loading}>Carregando...</Text>
         </View>
       </SafeAreaView>
     );
@@ -51,7 +51,6 @@ export default function TopNamesScreen() {
           style={styles.backButton}
           onPress={() => router.replace("/home")}
         >
-          <Ionicons name="arrow-back" size={22} color={theme.colors.primary} />
           <Text style={styles.backText}>Voltar</Text>
         </TouchableOpacity>
 
@@ -71,6 +70,11 @@ export default function TopNamesScreen() {
               ]}
               onPress={() => router.push(`/nameDetail?nome=${item.nome}`)}
             >
+              {/* Número do ranking */}
+              <View style={styles.rankContainer}>
+                <Text style={styles.rankText}>{index + 1}</Text>
+              </View>
+
               <View style={styles.cardLeft}>
                 <Ionicons
                   name="flame-outline"
@@ -110,17 +114,20 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
-  /* back button */
+   /* back button */
   backButton: {
-    flexDirection: "row",
-    alignItems: "center",
+    alignItems: "center", // Centraliza o texto horizontalmente
+    justifyContent: "center", // Centraliza o texto verticalmente
+    paddingVertical: 12, // Aumenta a área clicável verticalmente
+    paddingHorizontal: 16, // Aumenta a área clicável horizontalmente
+    borderRadius: 8, // Adiciona bordas arredondadas
+    backgroundColor: "#db3026", // Cor de fundo vermelha
     marginBottom: 12,
   },
-
   backText: {
     marginLeft: 8,
     fontSize: 16,
-    color: theme.colors.primary,
+    color: "white",
     fontWeight: "600",
   },
 
@@ -161,11 +168,20 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginBottom: 12,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
+    borderWidth: 1, // Adiciona uma borda para indicar elevação
+    borderColor: "#E0E0E0", // Cor tonal para representar elevação
+  },
+
+  rankContainer: {
+    width: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  rankText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: theme.colors.primary,
   },
 
   cardLeft: {
