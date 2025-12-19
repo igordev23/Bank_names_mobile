@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { ThemeProvider } from "styled-components";
-import { theme } from "./theme";
+import { theme } from "../theme/theme";
 
 const router = useRouter();
 

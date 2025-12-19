@@ -11,7 +11,7 @@ import { useTopNamesViewModel } from "../viewmodel/useTopNamesViewModel";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { theme } from "./theme";
+import { theme } from "../theme/theme";
 
 export default function TopNamesScreen() {
   const router = useRouter();

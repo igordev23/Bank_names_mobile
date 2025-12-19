@@ -10,7 +10,7 @@ import { useBottomNamesViewModel } from "../viewmodel/useBottomNamesViewModel";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { theme } from "./theme";
+import { theme } from "../theme/theme";
 
 export default function BottomNamesScreen() {
   const { state, actions } = useBottomNamesViewModel();

@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useNameDetailViewModel } from "../viewmodel/useNameDetailViewModel";
-import { theme } from "./theme";
+import { theme } from "../theme/theme";
 import { BarChart } from "react-native-gifted-charts";
 
 export default function NameDetailScreen() {

@@ -1,9 +1,51 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { theme } from "./theme";
+import { RewardedAd, RewardedAdEventType, AdEventType, TestIds } from "react-native-google-mobile-ads"; // Correção aqui
+import { theme } from "../theme/theme";
+
+/* ===========================
+   CONFIGURAÇÃO DO ANÚNCIO PREMIADO
+=========================== */
+const adUnitId = __DEV__ ? TestIds.REWARDED : "ca-app-pub-3940256099942544/5224354917"; // Use TestIds em desenvolvimento
+const rewardedAd = RewardedAd.createForAdRequest(adUnitId);
+
+async function showRewardedAd(onFinish: () => void) {
+  if (Platform.OS !== "android") {
+    onFinish();
+    return;
+  }
+
+  try {
+    // Adiciona eventos para o anúncio
+    rewardedAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
+      rewardedAd.show();
+    });
+
+    rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+      console.log("Usuário ganhou recompensa:", reward);
+    });
+
+    rewardedAd.addAdEventListener(AdEventType.CLOSED, () => {
+      onFinish();
+    });
+
+    // Carrega o anúncio
+    rewardedAd.load();
+  } catch (error) {
+    console.log("Erro no anúncio premiado:", error);
+    onFinish();
+  }
+}
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -18,17 +60,27 @@ export default function HomeScreen() {
           {/* Mais Usados */}
           <TouchableOpacity
             style={styles.card}
-            onPress={() => router.push("/topNames")}
+            onPress={() =>
+              showRewardedAd(() => router.push("/topNames"))
+            }
           >
-            <Ionicons name="trending-up" size={38} color={theme.colors.primary} />
+            <Ionicons
+              name="trending-up"
+              size={38}
+              color={theme.colors.primary}
+            />
             <Text style={styles.cardTitle}>Mais Usados</Text>
-            <Text style={styles.cardDesc}>Veja os nomes mais populares</Text>
+            <Text style={styles.cardDesc}>
+              Veja os nomes mais populares
+            </Text>
           </TouchableOpacity>
 
           {/* Mais Raros */}
           <TouchableOpacity
             style={styles.card}
-            onPress={() => router.push("/bottomNames")}
+            onPress={() =>
+              showRewardedAd(() => router.push("/bottomNames"))
+            }
           >
             <Ionicons
               name="trending-down"
@@ -36,13 +88,17 @@ export default function HomeScreen() {
               color={theme.colors.secondary}
             />
             <Text style={styles.cardTitle}>Mais Raros</Text>
-            <Text style={styles.cardDesc}>Descubra nomes pouco comuns</Text>
+            <Text style={styles.cardDesc}>
+              Descubra nomes pouco comuns
+            </Text>
           </TouchableOpacity>
 
           {/* Pesquisar */}
           <TouchableOpacity
             style={styles.cardLarge}
-            onPress={() => router.push("/search")}
+            onPress={() =>
+              showRewardedAd(() => router.push("/search"))
+            }
           >
             <Ionicons
               name="search-circle"
@@ -50,7 +106,9 @@ export default function HomeScreen() {
               color={theme.colors.accent}
             />
             <Text style={styles.cardTitle}>Pesquisar Nome</Text>
-            <Text style={styles.cardDesc}>Busque qualquer nome no Brasil</Text>
+            <Text style={styles.cardDesc}>
+              Busque qualquer nome no Brasil
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -58,6 +116,9 @@ export default function HomeScreen() {
   );
 }
 
+/* ===========================
+   ESTILOS
+=========================== */
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -67,7 +128,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 30, // 👍 Respira melhor abaixo do notch
+    paddingTop: 30,
   },
 
   title: {
@@ -91,8 +152,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 16,
-    borderWidth: 1, // Adiciona uma borda para indicar elevação
-    borderColor: "#E0E0E0", // Cor tonal para representar elevação
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
   },
 
   cardLarge: {
@@ -100,8 +161,8 @@ const styles = StyleSheet.create({
     padding: 26,
     borderRadius: 20,
     alignItems: "center",
-    borderWidth: 1, // Adiciona uma borda para indicar elevação
-    borderColor: "#E0E0E0", // Cor tonal para representar elevação
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
   },
 
   cardTitle: {

@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSearchViewModel } from "../viewmodel/useSearchViewModel";
-import { theme } from "./theme";
+import { theme } from "../theme/theme";
 import PieChart from "react-native-expo-pie-chart";
 import { BarChart } from "react-native-gifted-charts";
 import { Colors } from "react-native/Libraries/NewAppScreen";
