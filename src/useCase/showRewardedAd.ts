@@ -6,31 +6,35 @@ import {
   TestIds,
 } from "react-native-google-mobile-ads";
 
-const adUnitId = __DEV__ ? TestIds.REWARDED : "ca-app-pub-3940256099942544/5224354917"; // Use TestIds em desenvolvimento
-const rewardedAd = RewardedAd.createForAdRequest(adUnitId);
+const adUnitId = __DEV__
+  ? TestIds.REWARDED
+  : "ca-app-pub-3940256099942544/5224354917";
 
-export async function showRewardedAd(onFinish: () => void) {
+export function showRewardedAd(onFinish: () => void) {
   if (Platform.OS !== "android") {
     onFinish();
     return;
   }
 
-  try {
-    rewardedAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
+  const rewardedAd = RewardedAd.createForAdRequest(adUnitId);
+
+  const unsubscribeLoaded = rewardedAd.addAdEventListener(
+    RewardedAdEventType.LOADED,
+    () => {
       rewardedAd.show();
-    });
+    }
+  );
 
-    rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-      console.log("Usuário ganhou recompensa:", reward);
-    });
+  const unsubscribeClosed = rewardedAd.addAdEventListener(
+    AdEventType.CLOSED,
+    () => {
+      // 🔥 remove listeners
+      unsubscribeLoaded();
+      unsubscribeClosed();
 
-    rewardedAd.addAdEventListener(AdEventType.CLOSED, () => {
       onFinish();
-    });
+    }
+  );
 
-    rewardedAd.load();
-  } catch (error) {
-    console.log("Erro no anúncio premiado:", error);
-    onFinish();
-  }
+  rewardedAd.load();
 }

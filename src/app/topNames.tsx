@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../theme/theme";
+import {showRewardedAd } from "../useCase/showRewardedAd";
 
 export default function TopNamesScreen() {
   const router = useRouter();
@@ -68,7 +69,9 @@ export default function TopNamesScreen() {
                 styles.card,
                 { backgroundColor: index % 2 === 0 ? "#fff" : "#F0F9FF" },
               ]}
-              onPress={() => router.push(`/nameDetail?nome=${item.nome}`)}
+              onPress={() =>
+                showRewardedAd(() => router.push(`/nameDetail?nome=${item.nome}`))
+              }
             >
               {/* Número do ranking */}
               <View style={styles.rankContainer}>

@@ -77,11 +77,7 @@ export default function NameDetailScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons
-              name="arrow-back"
-              size={22}
-              color={theme.colors.primary}
-            />
+           
             <Text style={styles.backText}>Voltar</Text>
           </TouchableOpacity>
 
@@ -90,9 +86,7 @@ export default function NameDetailScreen() {
 
           {/* Card principal */}
           <View style={styles.infoCard}>
-            <Text style={styles.infoText}>
-              <Text style={styles.bold}>Sexo:</Text> {detail.sexo ?? "—"}
-            </Text>
+           
 
             <Text style={styles.infoText}>
               <Text style={styles.bold}>Localidade:</Text> {detail.localidade}
@@ -181,16 +175,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
+  /* back button */
   backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
+    alignItems: "center", // Centraliza o texto horizontalmente
+    justifyContent: "center", // Centraliza o texto verticalmente
+    paddingVertical: 12, // Aumenta a área clicável verticalmente
+    paddingHorizontal: 16, // Aumenta a área clicável horizontalmente
+    borderRadius: 8, // Adiciona bordas arredondadas
+    backgroundColor: "#db3026", // Cor de fundo vermelha
+    marginBottom: 12,
   },
-
   backText: {
-    marginLeft: 6,
     fontSize: 16,
-    color: theme.colors.primary,
+    color: "#FFFFFF", // Texto branco
     fontWeight: "600",
   },
 

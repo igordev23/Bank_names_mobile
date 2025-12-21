@@ -17,7 +17,7 @@ import { theme } from "../theme/theme";
 import PieChart from "react-native-expo-pie-chart";
 import { BarChart } from "react-native-gifted-charts";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-
+import {showRewardedAd } from "../useCase/showRewardedAd";
 
 
 
@@ -28,8 +28,11 @@ export default function SearchScreen() {
   const [selectedSex, setSelectedSex] = useState<"M" | "F" | "A">("A");
 
   const handleSearch = () => {
-    if (!query.trim()) return;
+     if (!query.trim()) return;
+
+  showRewardedAd(() => {
     actions.searchName(query, selectedSex);
+  });
   };
 
 
@@ -136,7 +139,7 @@ export default function SearchScreen() {
 
               <Text style={styles.resultText}>
                 <Text style={styles.bold}>Sexo:</Text>{" "}
-                {state.result.sexo ?? "—"}
+                {state.result.sexo ?? "Ambos"}
               </Text>
 
               <Text style={styles.resultText}>
@@ -328,7 +331,7 @@ const styles = StyleSheet.create({
   },
 
   pickerWrapper: {
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#5f84a2ff",
     borderRadius: 12,
     marginBottom: 20,
   },

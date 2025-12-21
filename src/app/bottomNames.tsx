@@ -11,7 +11,7 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../theme/theme";
-
+import {showRewardedAd } from "../useCase/showRewardedAd";
 export default function BottomNamesScreen() {
   const { state, actions } = useBottomNamesViewModel();
 
@@ -65,7 +65,9 @@ export default function BottomNamesScreen() {
                 styles.card,
                 { backgroundColor: index % 2 === 0 ? "#fff" : "#FFF7E6" },
               ]}
-              onPress={() => router.push(`/nameDetail?nome=${item.nome}`)}
+              onPress={() =>
+                showRewardedAd(() => router.push(`/nameDetail?nome=${item.nome}`))
+              }
             >
               <View style={styles.cardLeft}>
                 <Ionicons
