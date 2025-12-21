@@ -9,6 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../theme/theme";
+import {showRewardedAd } from "../useCase/showRewardedAd";
+import { showInterstitialAd } from "../useCase/showInterstitialAd";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -55,7 +57,9 @@ export default function HomeScreen() {
           {/* Pesquisar */}
           <TouchableOpacity
             style={styles.cardLarge}
-            onPress={() => router.push("/search")}
+            onPress={() =>
+              showInterstitialAd(() => router.push("/search"))
+            }
           >
             <Ionicons
               name="search-circle"
