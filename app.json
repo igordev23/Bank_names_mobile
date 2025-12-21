@@ -4,32 +4,37 @@
     "slug": "NomeBr",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/iconN.png",
+    "icon": "./assets/iconG.jpg",
     "scheme": "nomebr",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
+    "splash": {
+      "image": "./assets/splash-iconG.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E6F4FE"
+    },
    "android": {
   "adaptiveIcon": {
-    "foregroundImage": "./assets/adaptive-iconN.png",
+    "foregroundImage": "./assets/iconG.jpg",
     "backgroundColor": "#E6F4FE"
   },
   "edgeToEdgeEnabled": true,
   "predictiveBackGestureEnabled": false,
-  "package": "com.kyousoou.NomeBr"
+  "package": "com.avantech.nomebr"
 },
     "web": {
       "output": "static",
-      "favicon": "./assets/faviconN.png"
+      "favicon": "./assets/splash-iconG.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/faviconN.png",
+          "image": "./assets/splash-iconG.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
