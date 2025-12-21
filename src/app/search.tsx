@@ -48,14 +48,24 @@ export default function SearchScreen() {
     "#F5D0C5", // salmão suave
   ];
   const chartData = state.result
-    ? [...state.result.res]
-      .sort((a, b) => a.frequencia - b.frequencia)
+  ? [...state.result.res]
+      .sort((a, b) => {
+        const periodoA = a.periodoFormatado ?? a.periodo;
+        const periodoB = b.periodoFormatado ?? b.periodo;
+
+        // Extrai os anos iniciais dos períodos para comparação
+        const anoInicioA = parseInt(periodoA.split("-")[0], 10);
+        const anoInicioB = parseInt(periodoB.split("-")[0], 10);
+
+        return anoInicioA - anoInicioB; // Ordena pelos anos iniciais
+      })
       .map((item, index) => ({
         key: item.periodoFormatado ?? item.periodo,
         count: item.frequencia <= 0 ? 1 : item.frequencia, // garante mínimo
         color: periodColors[index % periodColors.length],
       }))
-    : [];
+  : [];
+
 
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
