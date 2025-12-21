@@ -8,7 +8,7 @@ import {
 
 const adUnitId = __DEV__
   ? TestIds.REWARDED
-  : "ca-app-pub-3940256099942544/5224354917";
+  : "ca-app-pub-4256068454909415/9802205490";
 
 export function showRewardedAd(onFinish: () => void) {
   if (Platform.OS !== "android") {
