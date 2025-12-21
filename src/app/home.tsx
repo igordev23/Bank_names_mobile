@@ -4,80 +4,13 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Platform,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { RewardedAd, RewardedAdEventType, AdEventType, TestIds } from "react-native-google-mobile-ads"; // Correção aqui
 import { theme } from "../theme/theme";
-import { InterstitialAd } from "react-native-google-mobile-ads"; // Importação para o anúncio intersticial
-// ... existing code ...
-/* ===========================
-   CONFIGURAÇÃO DO ANÚNCIO PREMIADO
-=========================== */
-const adUnitId = __DEV__ ? TestIds.REWARDED : "ca-app-pub-3940256099942544/5224354917"; // Use TestIds em desenvolvimento
-const rewardedAd = RewardedAd.createForAdRequest(adUnitId);
-
-async function showRewardedAd(onFinish: () => void) {
-  if (Platform.OS !== "android") {
-    onFinish();
-    return;
-  }
-
-  try {
-    // Adiciona eventos para o anúncio
-    rewardedAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
-      rewardedAd.show();
-    });
-
-    rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-      console.log("Usuário ganhou recompensa:", reward);
-    });
-
-    rewardedAd.addAdEventListener(AdEventType.CLOSED, () => {
-      onFinish();
-    });
-
-    // Carrega o anúncio
-    rewardedAd.load();
-  } catch (error) {
-    console.log("Erro no anúncio premiado:", error);
-    onFinish();
-  }
-}
-
-
-/* ===========================
-   CONFIGURAÇÃO DO ANÚNCIO INTERSTICIAL
-=========================== */
-const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-3940256099942544/1033173712"; // Use TestIds em desenvolvimento
-const interstitialAd = InterstitialAd.createForAdRequest(interstitialAdUnitId);
-
-async function showInterstitialAd(onFinish: () => void) {
-  if (Platform.OS !== "android") {
-    onFinish();
-    return;
-  }
-
-  try {
-    // Adiciona eventos para o anúncio intersticial
-    interstitialAd.addAdEventListener(AdEventType.LOADED, () => {
-      interstitialAd.show();
-    });
-
-    interstitialAd.addAdEventListener(AdEventType.CLOSED, () => {
-      onFinish();
-    });
-
-    // Carrega o anúncio
-    interstitialAd.load();
-  } catch (error) {
-    console.log("Erro no anúncio intersticial:", error);
-    onFinish();
-  }
-}
+import {showRewardedAd } from "../useCase/showRewardedAd";
+import { showInterstitialAd } from "../useCase/showInterstitialAd";
 
 export default function HomeScreen() {
   const router = useRouter();
