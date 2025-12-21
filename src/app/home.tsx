@@ -25,9 +25,7 @@ export default function HomeScreen() {
           {/* Mais Usados */}
           <TouchableOpacity
             style={styles.card}
-            onPress={() =>
-              showRewardedAd(() => router.push("/topNames"))
-            }
+            onPress={() => router.push("/topNames")}
           >
             <Ionicons
               name="trending-up"
@@ -43,9 +41,7 @@ export default function HomeScreen() {
           {/* Mais Raros */}
           <TouchableOpacity
             style={styles.card}
-            onPress={() =>
-              showRewardedAd(() => router.push("/bottomNames"))
-            }
+            onPress={() => router.push("/bottomNames")}
           >
             <Ionicons
               name="trending-down"
