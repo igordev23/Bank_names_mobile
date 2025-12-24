@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,68 +14,68 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSearchViewModel } from "../viewmodel/useSearchViewModel";
 import { theme } from "../theme/theme";
-import PieChart from "react-native-expo-pie-chart";
 import { BarChart } from "react-native-gifted-charts";
-import { Colors } from "react-native/Libraries/NewAppScreen";
-import {showRewardedAd } from "../useCase/showRewardedAd";
-
-
+import NoResultsModal from "../model/components/NoResultsModal";
 
 export default function SearchScreen() {
   const router = useRouter();
   const { state, actions } = useSearchViewModel();
   const [query, setQuery] = useState("");
   const [selectedSex, setSelectedSex] = useState<"M" | "F" | "A">("A");
-
-  const handleSearch = () => {
-     if (!query.trim()) return;
-
-  showRewardedAd(() => {
-    actions.searchName(query, selectedSex);
-  });
-  };
-
-
-  const periodColors = [
-    "#FFEDD5", // pêssego
-    "#FDE68A", // amarelo pastel
-    "#FECACA", // vermelho claro
-    "#E9D5FF", // lilás
-    "#D9F99D", // verde limão pastel
-    "#BFDBFE", // azul claro único
-    "#FBCFE8", // rosa pastel
-    "#FED7AA", // laranja claro
-    "#F5D0C5", // salmão suave
-  ];
-  const chartData = state.result
-  ? [...state.result.res]
-      .sort((a, b) => {
-        const periodoA = a.periodoFormatado ?? a.periodo;
-        const periodoB = b.periodoFormatado ?? b.periodo;
-
-        // Extrai os anos iniciais dos períodos para comparação
-        const anoInicioA = parseInt(periodoA.split("-")[0], 10);
-        const anoInicioB = parseInt(periodoB.split("-")[0], 10);
-
-        return anoInicioA - anoInicioB; // Ordena pelos anos iniciais
-      })
-      .map((item, index) => ({
-        key: item.periodoFormatado ?? item.periodo,
-        count: item.frequencia <= 0 ? 1 : item.frequencia, // garante mínimo
-        color: periodColors[index % periodColors.length],
-      }))
-  : [];
-
-
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const barData = chartData.map((item, index) => ({
-    value: item.count,
-    label: item.key,
-    color: periodColors[index % periodColors.length],
-  }));
+  const handleSearch = async () => {
+    if (!query.trim()) return;
 
+    setModalVisible(false);
+    setHasSearched(true);
+    setSelectedIndex(null); // Reseta o índice selecionado
+    await actions.searchName(query, selectedSex);
+  };
+
+  useEffect(() => {
+    if (hasSearched) {
+      if (state.result && state.result.res && state.result.res.length > 0) {
+        setModalVisible(false);
+      } else if (!state.loading && (!state.result || state.result.res.length === 0)) {
+        setModalVisible(true);
+      }
+    }
+  }, [state.result, state.loading, hasSearched]);
+
+  const periodColors = [
+    "#FFEDD5",
+    "#FDE68A",
+    "#FECACA",
+    "#E9D5FF",
+    "#D9F99D",
+    "#BFDBFE",
+    "#FBCFE8",
+    "#FED7AA",
+    "#F5D0C5",
+  ];
+
+  const chartData = state.result
+    ? [...state.result.res]
+        .sort((a, b) => {
+          const periodoA = a.periodoFormatado ?? a.periodo;
+          const periodoB = b.periodoFormatado ?? b.periodo;
+
+          const anoInicioA = parseInt(periodoA.split("-")[0], 10);
+          const anoInicioB = parseInt(periodoB.split("-")[0], 10);
+
+          return anoInicioA - anoInicioB;
+        })
+        .map((item, index) => ({
+          value: item.frequencia <= 0 ? 1 : item.frequencia,
+          label: item.periodoFormatado ?? item.periodo,
+          frontColor: periodColors[index % periodColors.length],
+          color: periodColors[index % periodColors.length],
+          onPress: () => setSelectedIndex(index), // Define o índice selecionado
+        }))
+    : [];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -85,29 +85,21 @@ export default function SearchScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
-
           {/* 🔙 Botão de voltar */}
           <TouchableOpacity style={styles.backButton} onPress={() => router.replace("/home")}>
-           
             <Text style={styles.backText}>Voltar</Text>
           </TouchableOpacity>
 
           {/* Títulos */}
           <Text style={styles.title}>Pesquisar Nome</Text>
-          <Text style={styles.subtitle}>
-            Consulta com base nos dados do IBGE
-          </Text>
+          <Text style={styles.subtitle}>Consulta com base nos dados do IBGE</Text>
 
           {/* Card do formulário */}
           <View style={styles.searchCard}>
             <Text style={styles.label}>Nome:</Text>
 
             <View style={styles.inputWrapper}>
-              <Ionicons
-                name="person-circle-outline"
-                size={22}
-                color={theme.colors.primary}
-              />
+              <Ionicons name="person-circle-outline" size={22} color={theme.colors.primary} />
               <TextInput
                 style={styles.input}
                 placeholder="Digite um nome"
@@ -120,17 +112,18 @@ export default function SearchScreen() {
             <Text style={styles.label}>Sexo:</Text>
 
             <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={selectedSex}
-                onValueChange={(v) => setSelectedSex(v)}
-              >
+              <Picker selectedValue={selectedSex} onValueChange={(v) => setSelectedSex(v)}>
                 <Picker.Item label="Ambos" value="A" />
                 <Picker.Item label="Masculino" value="M" />
                 <Picker.Item label="Feminino" value="F" />
               </Picker>
             </View>
 
-            <TouchableOpacity style={styles.button} onPress={handleSearch}>
+            <TouchableOpacity
+              style={[styles.button, state.loading && styles.buttonDisabled]}
+              onPress={handleSearch}
+              disabled={state.loading}
+            >
               <Ionicons name="search" size={20} color="#fff" />
               <Text style={styles.buttonText}>Pesquisar</Text>
             </TouchableOpacity>
@@ -148,13 +141,11 @@ export default function SearchScreen() {
               <Text style={styles.resultTitle}>{state.result.nome}</Text>
 
               <Text style={styles.resultText}>
-                <Text style={styles.bold}>Sexo:</Text>{" "}
-                {state.result.sexo ?? "Ambos"}
+                <Text style={styles.bold}>Sexo:</Text> {state.result.sexo ?? "Ambos"}
               </Text>
 
               <Text style={styles.resultText}>
-                <Text style={styles.bold}>Localidade:</Text>{" "}
-                {state.result.localidade}
+                <Text style={styles.bold}>Localidade:</Text> {state.result.localidade}
               </Text>
 
               <Text style={styles.resultText}>
@@ -162,11 +153,8 @@ export default function SearchScreen() {
                 {new Intl.NumberFormat("pt-BR").format(state.result.total)}
               </Text>
 
-              <Text style={styles.frequencyTitle}>
-                Frequência por período:
-              </Text>
+              <Text style={styles.frequencyTitle}>Frequência por período:</Text>
 
-              {/* Lista sem scroll — rola junto com a página */}
               <FlatList
                 data={state.result.res}
                 keyExtractor={(_, i) => i.toString()}
@@ -175,10 +163,7 @@ export default function SearchScreen() {
                   <View
                     style={[
                       styles.frequencyRow,
-                      {
-                        backgroundColor:
-                          periodColors[index % periodColors.length],
-                      },
+                      { backgroundColor: periodColors[index % periodColors.length] },
                     ]}
                   >
                     <Text style={styles.periodText}>
@@ -191,22 +176,15 @@ export default function SearchScreen() {
                   </View>
                 )}
               />
+            </View>
+          )}
 
-            </View>)}
-          {/* 📊 Gráfico de Colunas */}
+          {/* 📊 Gráfico de Barras */}
           <View style={styles.chartCard}>
             <Text style={styles.chartTitle}>Distribuição por Período</Text>
 
             <BarChart
-              data={chartData.map((item, index) => ({
-                value: item.count,
-                label: item.key,
-                frontColor: periodColors[index % periodColors.length],
-                color: periodColors[index % periodColors.length],
-
-                // 👉 Agora está correto
-                onPress: () => setSelectedIndex(index),
-              }))}
+              data={chartData}
               barWidth={28}
               spacing={14}
               barBorderRadius={6}
@@ -217,10 +195,10 @@ export default function SearchScreen() {
             {/* Legenda fixa */}
             <View style={styles.legendContainer}>
               {chartData.map((item) => (
-                <View key={item.key} style={styles.legendRow}>
+                <View key={item.label} style={styles.legendRow}>
                   <View style={[styles.colorBox, { backgroundColor: item.color }]} />
                   <Text style={styles.legendText}>
-                    {item.key}: {new Intl.NumberFormat("pt-BR").format(item.count)}
+                    {item.label}: {new Intl.NumberFormat("pt-BR").format(item.value)}
                   </Text>
                 </View>
               ))}
@@ -243,30 +221,31 @@ export default function SearchScreen() {
                   maxWidth: 150,
                 }}
               >
-                <Text
-                  style={{
-                    fontWeight: "bold",
-                    color: barData[selectedIndex].color,
-                  }}
-                >
-                  {barData[selectedIndex].label}
+                <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                  {chartData[selectedIndex]?.label}
                 </Text>
-
                 <Text>
-                  {new Intl.NumberFormat("pt-BR").format(
-                    barData[selectedIndex].value
-                  )}
+                  {new Intl.NumberFormat("pt-BR").format(chartData[selectedIndex]?.value)}
                 </Text>
               </View>
             )}
           </View>
 
-
+          {/* Modal para nenhum dado encontrado */}
+          <NoResultsModal visible={modalVisible} onClose={() => setModalVisible(false)} />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+
+
+
+
+
+
+
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -458,5 +437,35 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 15,
   },
-
+  buttonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

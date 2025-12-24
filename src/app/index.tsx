@@ -13,7 +13,7 @@ export default function SplashScreen() {
         <Text style={styles.title}>Banco de Nomes</Text>
 
         <Text style={styles.subtitle}>
-          Dados baseados no IBGE (até 2010).{"\n"}Podem conter imprecisões.
+          Dados baseados no IBGE (até 2010).{"\n"}Pode conter imprecisões.
         </Text>
 
         <TouchableOpacity

@@ -1,19 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
+  Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../theme/theme";
-import {showRewardedAd } from "../useCase/showRewardedAd";
-import { showInterstitialAd } from "../useCase/showInterstitialAd";
+import { showRewardedAd } from "../useCase/showRewardedAd";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [loadingAd, setLoadingAd] = useState(false);
+
+  const handleAdAndNavigate = async (adFunction: Function, route: string) => {
+    setLoadingAd(true);
+    await adFunction(() => {
+      setLoadingAd(false);
+      router.push(route as `/bottomNames` | `/topNames` | `/search`);
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -21,13 +31,22 @@ export default function HomeScreen() {
         <Text style={styles.title}>Explore os nomes do Brasil</Text>
         <Text style={styles.subtitle}>Dados oficiais baseados no IBGE</Text>
 
+        {/* Modal de carregamento */}
+        <Modal visible={loadingAd} transparent animationType="fade">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text style={styles.modalText}>Carregando anúncio...</Text>
+            </View>
+          </View>
+        </Modal>
+
         <View style={styles.cardsWrapper}>
           {/* Mais Usados */}
           <TouchableOpacity
             style={styles.card}
-            onPress={() =>
-              showRewardedAd(() => router.push("/topNames"))
-            }
+            onPress={() => handleAdAndNavigate(showRewardedAd, "/topNames")}
+            disabled={loadingAd}
           >
             <Ionicons
               name="trending-up"
@@ -43,9 +62,8 @@ export default function HomeScreen() {
           {/* Mais Raros */}
           <TouchableOpacity
             style={styles.card}
-            onPress={() =>
-              showRewardedAd(() => router.push("/bottomNames"))
-            }
+            onPress={() => handleAdAndNavigate(showRewardedAd, "/bottomNames")}
+            disabled={loadingAd}
           >
             <Ionicons
               name="trending-down"
@@ -61,9 +79,8 @@ export default function HomeScreen() {
           {/* Pesquisar */}
           <TouchableOpacity
             style={styles.cardLarge}
-            onPress={() =>
-              showRewardedAd(() => router.push("/search"))
-            }
+            onPress={() => handleAdAndNavigate(showRewardedAd, "/search")}
+            disabled={loadingAd}
           >
             <Ionicons
               name="search-circle"
@@ -141,5 +158,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     marginTop: 4,
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fundo semitransparente
+  },
+
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 16,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 10, // Sombra para Android
+  },
+
+  modalText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: theme.colors.primary,
+    textAlign: "center",
   },
 });

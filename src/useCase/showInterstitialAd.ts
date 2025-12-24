@@ -10,6 +10,11 @@ const interstitialAdUnitId = __DEV__
   : "ca-app-pub-3940256099942544/1033173712"; // Use TestIds em desenvolvimento
 const interstitialAd = InterstitialAd.createForAdRequest(interstitialAdUnitId);
 
+
+
+
+
+
 export async function showInterstitialAd(onFinish: () => void) {
   if (Platform.OS !== "android") {
     onFinish();

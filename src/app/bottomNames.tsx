@@ -61,14 +61,13 @@ export default function BottomNamesScreen() {
           contentContainerStyle={{ paddingBottom: 30 }}
           renderItem={({ item, index }) => (
             <TouchableOpacity
-              style={[
-                styles.card,
-                { backgroundColor: index % 2 === 0 ? "#fff" : "#FFF7E6" },
-              ]}
-              onPress={() =>
-                showRewardedAd(() => router.push(`/nameDetail?nome=${item.nome}`))
-              }
-            >
+  style={[
+    styles.card,
+    { backgroundColor: index % 2 === 0 ? "#fff" : "#FFF7E6" },
+  ]}
+  onPress={() => router.push(`/nameDetail?nome=${item.nome}`)} // Corrigido
+>
+
               <View style={styles.cardLeft}>
                 <Ionicons
                   name="sparkles-outline"

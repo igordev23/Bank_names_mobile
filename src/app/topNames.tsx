@@ -65,14 +65,13 @@ export default function TopNamesScreen() {
           contentContainerStyle={{ paddingBottom: 30 }}
           renderItem={({ item, index }) => (
             <TouchableOpacity
-              style={[
-                styles.card,
-                { backgroundColor: index % 2 === 0 ? "#fff" : "#F0F9FF" },
-              ]}
-              onPress={() =>
-                showRewardedAd(() => router.push(`/nameDetail?nome=${item.nome}`))
-              }
-            >
+  style={[
+    styles.card,
+    { backgroundColor: index % 2 === 0 ? "#fff" : "#F0F9FF" },
+  ]}
+  onPress={() => router.push(`/nameDetail?nome=${item.nome}`)} // Corrigido
+>
+
               {/* Número do ranking */}
               <View style={styles.rankContainer}>
                 <Text style={styles.rankText}>{index + 1}</Text>
