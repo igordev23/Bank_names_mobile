@@ -9,7 +9,7 @@ Publicado na Google Play: [NomeBr](https://play.google.com/store/apps/details?id
 - **Mais raros:** nomes pouco registrados, para quem procura algo diferente
 - **Pesquisar nome:** a frequência de um nome ao longo das décadas, com filtro por sexo
 
-Os dados vêm da [API de Nomes do IBGE](https://servicodados.ibge.gov.br/api/docs/nomes)
+Os dados vêm da [API de Nomes do IBGE](https://servicodados.ibge.gov.br/api/docs/nomes?versao=2)
 (`/api/v2/censos/nomes`), consultada ao vivo.
 
 ## Stack
